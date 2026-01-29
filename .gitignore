@@ -1,0 +1,25 @@
+# python cache
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*$py.class
+
+# entornos virtuales
+env/
+venv/
+
+# archivos entornos
+.env
+
+# archivos logs
+*.log
+
+# testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+
+# directios y archivos
