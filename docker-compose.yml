@@ -1,0 +1,28 @@
+
+services:
+  api:
+    build: .
+    container_name: fintech_api
+    env_file: .env
+    environment:
+      - FRONTEND_URL=${FRONTEND_URL}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    volumes:
+      - .:/src
+
+
+  db:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    container_name: oracle_db
+    env_file: .env
+    ports:
+      - "1522:1521"
+    volumes:
+      - fintech_data:/var/lib/oracle/data
+    restart: unless-stopped
+
+volumes:
+  fintech_data:
