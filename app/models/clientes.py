@@ -1,6 +1,4 @@
 from datetime import datetime
-
-from sqlalchemy.orm import relationship
 from sqlmodel import Field, SQLModel, Relationship
 from pydantic import EmailStr
 
@@ -27,7 +25,7 @@ class Clientes(SQLModel, table=True):
     id_tipo_cliente: int = Field(foreign_key="tipo_clientes.id")
 
     # campo para relaciones
-    tipo_cliente: TipoClientes = Relationship(back_populates="clientes")
+    tipo_cliente: "TipoClientes" = Relationship(back_populates="clientes")
 
 
 

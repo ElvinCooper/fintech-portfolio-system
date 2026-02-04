@@ -1,7 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from decimal import Decimal
 from datetime import datetime
-from facturas import Factura
 
 
 class Pagos(SQLModel, table=True):
@@ -14,4 +13,4 @@ class Pagos(SQLModel, table=True):
     metodo_pago: str = Field(nullable=False, max_length=12)
 
     # campo para relaciones
-    factura: Factura = Relationship(back_populates="pagos")
+    factura: "Factura" = Relationship(back_populates="pagos")
