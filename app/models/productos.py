@@ -9,7 +9,6 @@ class Producto(SQLModel, table=True):
     id : int = Field(primary_key=True)
     descripcion: str = Field(nullable=False, max_length=40)
     precio_standar: Decimal = Field(max_digits=10, decimal_places=2)
-    cartera_id: int = Field(foreign_key="cartera.id", nullable=False)
     categoria_producto_id: int = Field(foreign_key="categoria_productos.id", nullable=False)
 
     # campos para relaciones

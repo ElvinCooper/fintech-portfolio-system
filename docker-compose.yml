@@ -21,7 +21,7 @@ services:
     ports:
       - "1522:1521"
     volumes:
-      - fintech_data:/var/lib/oracle/data
+      - fintech_data:/opt/oracle/oradata
     restart: unless-stopped
 
 volumes:
