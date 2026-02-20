@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 from datetime import datetime
 from decimal import Decimal
+from typing import Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -16,4 +15,4 @@ class Pagos(SQLModel, table=True):
     metodo_pago: str = Field(nullable=False, max_length=20)  # Aumentado de 12 a 20
 
     # campo para relaciones corregido
-    factura: Factura = Relationship(back_populates="pagos")
+    factura: "Factura" = Relationship(back_populates="pagos")

@@ -21,6 +21,8 @@ ignore = [
     "F821", # Ignorar nombres no definidos en modelos (SQLModel maneja referencias circulares)
     "B905", # Ignorar zip(strict=True) para Python < 3.10 compatible (aunque usamos 3.12)
     "E402", # Ignorar imports no al principio (útil para scripts de seed)
+    "UP006", # Ignorar conversión de List a list (causa problemas en mappers de SQLModel)
+    "UP035", # Ignorar advertencias de deprecación de typing.List
 ]
 
 [tool.ruff.format]

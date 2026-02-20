@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 from datetime import datetime
 from decimal import Decimal
+from typing import List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -17,9 +16,9 @@ class Cartera(SQLModel, table=True):
     proximo_vencimiento: datetime = Field(default_factory=datetime.now)
 
     # campos para relaciones
-    clientes: Clientes = Relationship(back_populates="cartera")
-    producto: Producto = Relationship(back_populates="carteras")
-    facturas: list[Factura] = Relationship(back_populates="cartera")
+    clientes: "Clientes" = Relationship(back_populates="cartera")
+    producto: "Producto" = Relationship(back_populates="carteras")
+    facturas: List["Factura"] = Relationship(back_populates="cartera")
 
 
 class AudCartera(SQLModel, table=True):

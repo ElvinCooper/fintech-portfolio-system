@@ -1,6 +1,5 @@
-from __future__ import annotations
-
 from decimal import Decimal
+from typing import List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -16,5 +15,5 @@ class Factura(SQLModel, table=True):
     cartera_id: int = Field(foreign_key="cartera.id")
 
     # campos para relaciones
-    cartera: Cartera = Relationship(back_populates="facturas")
-    pagos: list[Pagos] = Relationship(back_populates="factura")
+    cartera: "Cartera" = Relationship(back_populates="facturas")
+    pagos: List["Pagos"] = Relationship(back_populates="factura")

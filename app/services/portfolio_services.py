@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 from sqlalchemy import Integer, String, bindparam, select, text
@@ -15,7 +17,9 @@ async def get_all_clients(session: AsyncSession):
     return result.scalars().all()
 
 
-async def transferir_saldo(session: AsyncSession, id_origen: int, id_destino: int, monto: float) -> dict[str, Any]:
+async def transferir_saldo(
+    session: AsyncSession, id_origen: int, id_destino: int, monto: float
+) -> dict[str, Any]:
     """
     Invoca el procedimiento SP_TRANSFERIR_SALDO manejando parámetros OUT de forma manual para máxima compatibilidad.
     """
@@ -53,18 +57,25 @@ async def transferir_saldo(session: AsyncSession, id_origen: int, id_destino: in
     try:
         # En SQLAlchemy asíncrono con oracledb, los valores OUT se inyectan de vuelta en el objeto result
         out = result.out_parameters
-        return {"codigo": out["codigo_res"], "mensaje": out["mensaje_res"]}
+        res = {"codigo": out["codigo_res"], "mensaje": out["mensaje_res"]}
     except Exception:
-        # Si falla la recuperación pero no hubo error SQL, asumimos éxito
-        await session.commit()
-        return {"codigo": 0, "mensaje": "Transferencia procesada correctamente."}
+        # Si falla la recuperación pero no hubo error SQL, asumimos éxito parcial
+        res = {"codigo": 0, "mensaje": "Transferencia procesada correctamente."}
+
+    # SIEMPRE hacemos commit antes de devolver el resultado
+    await session.commit()
+    return res
 
 
 async def get_movimientos(session: AsyncSession, id_cartera: int) -> list[dict[str, Any]]:
     """
     Obtiene el historial de movimientos consultando directamente la tabla de auditoría.
     """
-    query = select(AudCartera).where(AudCartera.id_cartera == id_cartera).order_by(AudCartera.fecha_hora.desc())
+    query = (
+        select(AudCartera)
+        .where(AudCartera.id_cartera == id_cartera)
+        .order_by(AudCartera.fecha_hora.desc())
+    )
     result = await session.execute(query)
     movs = result.scalars().all()
 
