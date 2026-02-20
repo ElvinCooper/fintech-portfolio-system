@@ -89,7 +89,7 @@ def upgrade() -> None:
     sa.Column('factura_id', sa.Integer(), nullable=False),
     sa.Column('fecha_pago', sa.DateTime(), nullable=False),
     sa.Column('monto_pago', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('metodo_pago', sqlmodel.sql.sqltypes.AutoString(length=12), nullable=False),
+    sa.Column('metodo_pago', sqlmodel.sql.sqltypes.AutoString(length=20), nullable=False),
     sa.ForeignKeyConstraint(['factura_id'], ['facturas.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
