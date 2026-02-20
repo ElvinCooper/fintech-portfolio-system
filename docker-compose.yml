@@ -9,7 +9,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy # Wait for db service to be healthy
     volumes:
       - .:/src
 
@@ -23,6 +24,11 @@ services:
     volumes:
       - fintech_data:/var/lib/oracle/data
     restart: unless-stopped
+    healthcheck: # Add healthcheck to db service
+      test: ["CMD", "sh", "-c", "sqlplus -L system/oracle@localhost:1521/XEPDB1 AS SYSDBA <<< 'select 1 from dual;' > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 10 # Allow enough retries for Oracle to start
 
 volumes:
   fintech_data:
