@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
 
 from app.database.connection import get_async_session
 from app.models.clientes import Clientes
@@ -12,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[Clientes])
+@router.get("/", response_model=list[Clientes])
 async def get_clients(session: AsyncSession = Depends(get_async_session)):
     """
     Obtiene una lista de todos los clientes de forma asíncrona.

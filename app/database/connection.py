@@ -1,8 +1,9 @@
 import os
+
 from dotenv import load_dotenv
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from sqlmodel import create_engine, Session
+from sqlmodel import Session, create_engine
 
 load_dotenv()
 
@@ -24,14 +25,14 @@ sync_engine = create_engine(SYNC_DATABASE_URL, echo=True)
 async_engine = create_async_engine(ASYNC_DATABASE_URL, echo=True, future=True)
 
 # Fábrica de sesiones asíncronas
-AsyncSessionLocal = sessionmaker(
-    async_engine, class_=AsyncSession, expire_on_commit=False
-)
+AsyncSessionLocal = sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
+
 
 # Dependencia para obtener sesión sincrónica (si se requiere)
 def get_session():
     with Session(sync_engine) as session:
         yield session
+
 
 # Dependencia para obtener sesión asíncrona (Recomendada para FastAPI)
 async def get_async_session() -> AsyncSession:

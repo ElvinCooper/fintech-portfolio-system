@@ -1,5 +1,7 @@
-from .clientes import Clientes, TipoClientes
-from .facturas import Factura
-from .pagos import Pagos
-from .productos import Producto, CategoriaProducto
-from .cartera import Cartera
+from .cartera import Cartera as Cartera
+from .clientes import Clientes as Clientes
+from .clientes import TipoClientes as TipoClientes
+from .facturas import Factura as Factura
+from .pagos import Pagos as Pagos
+from .productos import CategoriaProducto as CategoriaProducto
+from .productos import Producto as Producto

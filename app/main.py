@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app.api import clientes_endpoint, healthcheck_endpoint, cartera_endpoint
+
+from app.api import cartera_endpoint, clientes_endpoint, healthcheck_endpoint
 
 app = FastAPI(
     title="Customer Portfolio System",
@@ -18,5 +19,5 @@ def read_root():
     return {
         "message": "Welcome to the Customer Portfolio System API",
         "docs": "/docs",
-        "status": "online"
+        "status": "online",
     }
