@@ -1,0 +1,88 @@
+
+
+# 📋 Tablero Kanban: Customer Portfolio System
+
+## Fase 1: Infraestructura y Configuración
+
+### Ticket 1: Inicialización del Repositorio y Estructura Senior
+**Descripción:** Configurar el esqueleto del proyecto siguiendo el estándar de arquitectura empresarial para asegurar la escalabilidad.
+**Tareas:**
+- [ ] Inicializar repositorio Git con flujo GitFlow.
+- [ ] Crear estructura de carpetas: `app/api`, `app/core`, `app/models`, `app/services`, `app/database`.
+- [ ] Configurar `requirements.txt` con Python 3.10+, FastAPI y SQLModel.
+- [ ] Crear archivo `.env.example` para variables de entorno.
+
+### Ticket 2: Dockerización del Entorno Híbrido
+**Descripción:** Crear la infraestructura necesaria para orquestar la API y la base de datos Oracle de forma aislada.
+**Tareas:**
+- [ ] Escribir `Dockerfile` para la aplicación FastAPI.
+- [ ] Configurar `docker-compose.yml` para levantar la API y el contenedor de Oracle Database 19c/21c.
+- [ ] Validar conectividad inicial entre contenedores.
+
+---
+
+## Fase 2: Capa de Persistencia (Oracle Database)
+
+### Ticket 3: Definición de Esquema y Auditoría Nativa
+**Descripción:** Implementar la base de datos con lógica de integridad y trazabilidad automática.
+**Tareas:**
+- [ ] Crear `database/schema.sql` con tablas de clientes y carteras.
+- [ ] Implementar el Trigger `TRG_AUDIT_CARTERA` para cumplimiento y auditoría.
+- [ ] Crear la vista `VW_RESUMEN_CARTERA` para reportes consolidados.
+
+### Ticket 4: Implementación de Lógica PL/SQL Crítica
+**Descripción:** Desarrollar los objetos inteligentes en Oracle para manejar operaciones financieras complejas.
+**Tareas:**
+- [ ] Programar `SP_TRANSFERIR_SALDO` con manejo de transacciones nativas y parámetros de salida.
+- [ ] Implementar `SP_GET_MOVIMIENTOS` utilizando **RefCursors** para optimizar el envío de datos.
+- [ ] Crear la función `FN_CALCULAR_TASAS` para lógica matemática pura.
+
+---
+
+## Fase 3: Núcleo del Backend (FastAPI)
+
+### Ticket 5: Capa de Datos con SQLModel y Async Oracle
+**Descripción:** Configurar la conexión asincrónica y el mapeo de objetos entre Python y Oracle.
+**Tareas:**
+- [ ] Configurar la sesión de base de datos en `app/database/` usando `python-oracledb`.
+- [ ] Definir modelos de datos en `app/models/` utilizando **SQLModel**.
+
+### Ticket 6: Capa de Servicios y Consumo de PL/SQL
+**Descripción:** Implementar el puente entre los endpoints de la API y los procedimientos almacenados de Oracle.
+**Tareas:**
+- [ ] Desarrollar lógica en `app/services/` para invocar procedimientos PL/SQL.
+- [ ] Gestionar el mapeo de **RefCursors** y parámetros **OUT** obtenidos de la base de datos.
+
+### Ticket 7: Exposición de Endpoints RESTful
+**Descripción:** Crear la interfaz de comunicación para los clientes externos usando FastAPI.
+**Tareas:**
+- [ ] Definir rutas en `app/api/` para gestión de carteras y consulta de movimientos.
+- [ ] Implementar validación de esquemas con **Pydantic v2**.
+- [ ] Verificar la generación automática de documentación en `/docs` (Swagger UI).
+
+---
+
+## Fase 4: Calidad y DevOps
+
+### Ticket 8: Automatización de Calidad (CI/CD)
+**Descripción:** Configurar el pipeline que garantice que el código cumple con los estándares profesionales.
+**Tareas:**
+- [ ] Configurar GitHub Action para **Linting** con `Flake8` (estándar PEP8).
+- [ ] Implementar escaneo de seguridad de dependencias.
+- [ ] Añadir paso de **Container Build** para validar la imagen Docker.
+
+### Ticket 9: Pruebas Unitarias y de Integración
+**Descripción:** Asegurar la fiabilidad de los servicios mediante pruebas automatizadas.
+**Tareas:**
+- [ ] Crear suite de pruebas en `tests/` usando `Pytest`.
+- [ ] Simular respuestas de base de datos (Mocking) para probar la lógica de los servicios.
+
+---
+
+## Fase 5: Documentación de Impacto
+
+### Ticket 10: Documentación Visual y DER
+**Descripción:** Añadir elementos visuales que faciliten la comprensión de la arquitectura.
+**Tareas:**
+- [ ] Crear un **Diagrama Entidad-Relación (DER)** en Mermaid.js que muestre tablas y auditoría.
+- [ ] Completar el archivo `README.md` con instrucciones de "Quick Start" mediante Docker.
