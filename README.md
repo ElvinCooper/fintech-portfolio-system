@@ -1,14 +1,24 @@
 # 🚀 Customer Portfolio System (FinTech API)
 
-Sistema empresarial para la gestión centralizada de carteras de clientes, desarrollado con **FastAPI**, **SQLModel** y **Oracle Database 21c**. El sistema utiliza lógica nativa PL/SQL para operaciones críticas y auditoría automática.
+Sistema empresarial para la gestión centralizada de carteras de clientes, desarrollado con **FastAPI**, **SQLModel** y **Oracle Database 21c**. Este sistema implementa un modelo híbrido que combina la agilidad de un backend moderno con la robustez de la lógica nativa en base de datos.
 
 ## 🏗️ Arquitectura del Sistema
 
-El proyecto sigue una arquitectura de capas diseñada para escalabilidad y mantenibilidad:
-- **API Layer (FastAPI):** Endpoints RESTful asíncronos.
-- **Service Layer:** Lógica de negocio e integración con PL/SQL.
-- **Persistence Layer (SQLModel + Oracle):** Modelado de datos y migraciones con Alembic.
-- **DB Layer (PL/SQL):** Triggers de auditoría, Procedimientos de transferencia y Vistas de reporte.
+El proyecto sigue una arquitectura modular de capas:
+- **API Layer (FastAPI):** Endpoints RESTful asíncronos, inyección de dependencias y validación Pydantic v2.
+- **Service Layer:** Orquestación de lógica de negocio y "bridge" hacia procedimientos PL/SQL.
+- **Persistence Layer (SQLModel + Oracle):** Mapeo objeto-relacional (ORM) con soporte asíncrono nativo.
+- **DB Layer (PL/SQL):** 
+  - **Auditoría:** Registro automático de cambios de saldo mediante triggers.
+  - **Transaccionalidad:** Transferencias de saldo atómicas mediante procedimientos almacenados.
+  - **Reporting:** Vistas optimizadas para consultas de resumen.
+
+## 🌟 Características Principales
+- ✅ **Gestión de Clientes:** CRUD completo y clasificación por tipos.
+- ✅ **Carteras Financieras:** Seguimiento de saldos, productos y vencimientos.
+- ✅ **Ciclo de Facturación:** Modelado de facturas y registros de pagos.
+- ✅ **Transferencias Blindadas:** Lógica de transferencia ejecutada directamente en el motor de DB.
+- ✅ **Trazabilidad Total:** Auditoría nativa de movimientos de saldo.
 
 ## 📊 Diagrama Entidad-Relación (DER)
 
@@ -21,79 +31,78 @@ erDiagram
     CARTERA ||--o{ FACTURAS : "genera"
     FACTURAS ||--o{ PAGOS : "recibe"
     CARTERA ||--o{ AUD_CARTERA : "registra cambios"
-
-    CLIENTES {
-        int id PK
-        string nombre
-        string email
-        string telefono
-        string estado
-        int id_tipo_cliente FK
-    }
-
-    CARTERA {
-        int id PK
-        int cliente_id FK
-        int producto_id FK
-        decimal saldo_pendiente
-        datetime fecha_inicio
-    }
-
-    AUD_CARTERA {
-        int id PK
-        int id_cartera
-        string tipo_operacion
-        string valor_anterior
-        string valor_nuevo
-        string usuario_bd
-        timestamp fecha_hora
-    }
 ```
 
-## 🛠️ Quick Start (Docker)
+## 📂 Estructura del Proyecto
 
-Sigue estos pasos para levantar el entorno completo en menos de 5 minutos:
+```text
+├── alembic/              # Scripts de migración de base de datos
+├── app/
+│   ├── api/              # Routers y definiciones de endpoints
+│   ├── core/             # Configuraciones globales y seguridad
+│   ├── database/         # Conexión, motor asíncrono y scripts SQL
+│   ├── models/           # Definiciones de SQLModel (Tablas)
+│   ├── services/         # Lógica de negocio e integración PL/SQL
+│   └── main.py           # Punto de entrada de la aplicación
+├── tests/                # Suite de pruebas (Unitarias e Integración)
+├── docker-compose.yml    # Orquestación de servicios (API + Oracle)
+└── pyproject.toml        # Configuración de herramientas (Ruff, Pytest)
+```
+
+## 🛠️ Tecnologías
+- **Backend:** Python 3.12, FastAPI, SQLModel.
+- **Database:** Oracle 21c XE, `python-oracledb` (Async).
+- **Quality:** Ruff (Linter), Pytest, GitHub Actions (CI).
+
+## 🚀 Instalación y Despliegue
 
 ### 1. Requisitos
-- Docker y Docker Compose instalados.
-- Python 3.10+ (opcional para desarrollo local).
+- Docker y Docker Compose.
+- Python 3.12 (para desarrollo local).
 
 ### 2. Configuración
 Crea un archivo `.env` basado en `.env.example`:
-```bash
-cp .env.example .env
+```env
+DB_USER=system
+ORACLE_PWD=Myoraclesecret
+DB_HOST=db
+DB_PORT=1521
+DB_SERVICE_NAME=XEPDB1
 ```
 
-### 3. Levantar el Sistema
+### 3. Levantar con Docker
 ```bash
-# Levantar base de datos y API
 docker-compose up -d
 ```
 
-### 4. Inicializar Datos (Seed)
-Una vez que Oracle esté listo (puedes verificar con `docker logs oracle_db`), ejecuta el script de poblado:
+### 4. Inicialización de Datos
 ```bash
-# Instalación de dependencias locales para el seed
-pip install -r requirements.txt
+# Aplicar migraciones
+alembic upgrade head
+
+# Poblar base de datos con datos de prueba
 python seed_db.py
 ```
 
-## 🔌 Uso de la API
-
-Una vez levantado el sistema, puedes acceder a la documentación interactiva:
+## 🔌 Documentación de la API
+Una vez arriba, explora los endpoints de forma interactiva:
 👉 **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
 
-### Endpoints Principales:
-- `GET /clientes/`: Listado completo de clientes.
-- `GET /cartera/resumen`: Vista consolidada de saldos.
-- `POST /cartera/transferir`: Transferencia entre cuentas (Procedimiento PL/SQL).
-- `GET /cartera/movimientos/{id}`: Historial de auditoría (Trigger).
+## 🔄 Flujo de Desarrollo
 
-## 🧪 Pruebas
-Ejecuta la suite de pruebas unitarias y de integración:
+### Añadir un nuevo Modelo
+1. Define la clase en `app/models/`.
+2. Genera la migración: `alembic revision --autogenerate -m "descripción"`.
+3. Aplica: `alembic upgrade head`.
+
+### Ejecutar Pruebas
 ```bash
-pytest
+pytest -v
 ```
 
+## ⚠️ Troubleshooting
+- **Oracle Startup:** El contenedor de Oracle XE puede tardar de 2 a 4 minutos en estar listo para recibir conexiones en la PDB `XEPDB1`.
+- **Conexión Externa:** Usa el puerto `1522` para herramientas como DBeaver o SQL Developer.
+
 ---
-**Desarrollado con ❤️ para entornos financieros de alta disponibilidad.**
+**Desarrollado con estándares de alta disponibilidad y mantenibilidad.**
