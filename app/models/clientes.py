@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import List
 
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
@@ -20,7 +20,7 @@ class Clientes(SQLModel, table=True):
 
     id: int = Field(default=None, primary_key=True)
     nombre: str = Field(nullable=False, max_length=40)
-    telefono: Optional[str] = Field(default=None, max_length=15)
+    telefono: str | None = Field(default=None, max_length=15)
     email: EmailStr = Field(nullable=False, max_length=40)
     direccion: str = Field(nullable=False, max_length=40)
     fecha_registro: datetime = Field(default_factory=datetime.now)
