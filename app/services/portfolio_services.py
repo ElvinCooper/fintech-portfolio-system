@@ -17,9 +17,7 @@ async def get_all_clients(session: AsyncSession):
     return result.scalars().all()
 
 
-async def transferir_saldo(
-    session: AsyncSession, id_origen: int, id_destino: int, monto: float
-) -> dict[str, Any]:
+async def transferir_saldo(session: AsyncSession, id_origen: int, id_destino: int, monto: float) -> dict[str, Any]:
     """
     Invoca el procedimiento SP_TRANSFERIR_SALDO manejando parámetros OUT de forma manual para máxima compatibilidad.
     """
@@ -71,11 +69,7 @@ async def get_movimientos(session: AsyncSession, id_cartera: int) -> list[dict[s
     """
     Obtiene el historial de movimientos consultando directamente la tabla de auditoría.
     """
-    query = (
-        select(AudCartera)
-        .where(AudCartera.id_cartera == id_cartera)
-        .order_by(AudCartera.fecha_hora.desc())
-    )
+    query = select(AudCartera).where(AudCartera.id_cartera == id_cartera).order_by(AudCartera.fecha_hora.desc())
     result = await session.execute(query)
     movs = result.scalars().all()
 
