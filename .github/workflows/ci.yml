@@ -1,0 +1,59 @@
+name: CI - Quality & DevOps
+
+on:
+  push:
+    branches: [ "main", "esquemadb-auditoria" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  linting:
+    name: Linting & Style (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: 'pip'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+          pip install -r requirements.txt
+          
+      - name: Run Ruff Check
+        run: ruff check .
+        
+      - name: Run Ruff Format Check
+        run: ruff format --check .
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Bandit (Security)
+        run: |
+          pip install bandit
+          bandit -r app/ -ll
+          
+      - name: Run Safety (Dependencies)
+        run: |
+          pip install safety
+          safety check -r requirements.txt || true # Informative for now
+
+  docker-build:
+    name: Container Build Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Docker Image
+        run: |
+          docker build -t fintech-api:test .
+          docker images

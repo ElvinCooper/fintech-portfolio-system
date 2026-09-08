@@ -1,10 +1,5 @@
-from sqlmodel import SQLModel
 from connection import engine
-from app.models.clientes import Clientes, TipoClientes
-from app.models.facturas import Factura
-from app.models.productos import Producto, CategoriaProducto
-from app.models.cartera import Cartera
-from app.models.pagos import Pagos
+from sqlmodel import SQLModel
 
 
 def migrate():

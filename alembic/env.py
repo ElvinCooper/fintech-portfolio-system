@@ -1,74 +1,60 @@
+import os
+import sys
 from logging.config import fileConfig
-from sqlmodel import SQLModel
-from sqlalchemy import engine_from_config
+
+from sqlalchemy import engine_from_config, create_engine
 from sqlalchemy import pool
+from dotenv import load_dotenv
 
 from alembic import context
 
-import os
-from dotenv import load_dotenv
+# --- ESTO ES LO NUEVO PARA SQLMODEL ---
+from sqlmodel import SQLModel
+# Añadir el directorio raíz al path para importar los modelos
+sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 
-# importacion de los modelos definidos para la base de datos
-
-from app.models.clientes import Clientes, TipoClientes
-from app.models.pagos import Pagos
-from app.models.productos import Producto, CategoriaProducto
-from app.models.cartera import Cartera
-from app.models.facturas import Factura
-
+# Importar modelos a través del __init__ corregido
+from app.models import Clientes, TipoClientes, Cartera, Factura, Producto, CategoriaProducto, Pagos
+# ---------------------------------------
 
 load_dotenv()
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("ORACLE_PWD")
-
-# Construir URL de conexión
-DATABASE_URL = f"oracle+oracledb://{DB_USER}:{DB_PASSWORD}@db:1521/XE"
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# Configurar la URL en el config
-config.set_main_option('sqlalchemy.url', DATABASE_URL)
-
 # Interpret the config file for Python logging.
-# This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# CRÍTICO: Usar SQLModel.metadata
+# target_metadata
 target_metadata = SQLModel.metadata
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-# target_metadata = None
+def include_object(object, name, type_, reflected, compare_to):
+    if type_ == "table":
+        if name.lower().startswith("logmnr") or name.lower().startswith("logstdby"):
+            return False
+        if name.lower().startswith("ol$") or name.lower().startswith("sys_"):
+            return False
+    return True
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
-
+def get_url():
+    user = os.getenv("DB_USER", "system")
+    password = os.getenv("ORACLE_PWD", "oracle")
+    host = os.getenv("DB_HOST", "localhost")
+    port = os.getenv("DB_PORT", "1522")
+    service = os.getenv("DB_SERVICE_NAME", "XEPDB1")
+    # Formato más robusto para oracledb
+    return f"oracle+oracledb://{user}:{password}@{host}:{port}/?service_name={service}"
 
 def run_migrations_offline() -> None:
-    """Run migrations in 'offline' mode.
-
-    This configures the context with just a URL
-    and not an Engine, though an Engine is acceptable
-    here as well.  By skipping the Engine creation
-    we don't even need a DBAPI to be available.
-
-    Calls to context.execute() here emit the given string to the
-    script output.
-
-    """
-    url = config.get_main_option(f"oracle+oracledb://{DB_USER}:{DB_PASSWORD}@db:1521/XE")
+    url = get_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -76,19 +62,15 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in 'online' mode.
-
-    In this scenario we need to create an Engine
-    and associate a connection with the context.
-
-    """
-    from app.database.connection import engine
-
-    connectable = engine
+    # Crear engine directamente para evitar problemas con engine_from_config y el driver
+    url = get_url()
+    connectable = create_engine(url, poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection, 
+            target_metadata=target_metadata,
+            include_object=include_object,
         )
 
         with context.begin_transaction():
