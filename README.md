@@ -1,82 +1,88 @@
-# 🚀 Customer Portfolio System (FinTech API)
+# Customer Portfolio System
 
-Sistema empresarial para la gestión centralizada de carteras de clientes, desarrollado con **FastAPI**, **SQLModel** y **Oracle Database 21c**. El sistema utiliza lógica nativa PL/SQL para operaciones críticas y auditoría automática.
+> **Oracle + PL/SQL + FastAPI + Modern Backend Architecture**
 
-## 🏗️ Arquitectura del Sistema
+An independent portfolio project that combines Oracle Database and PL/SQL
+business logic with a modern Python backend built with FastAPI and SQLModel.
 
-El proyecto sigue una arquitectura de capas diseñada para escalabilidad y mantenibilidad:
-- **API Layer (FastAPI):** Endpoints RESTful asíncronos.
-- **Service Layer:** Lógica de negocio e integración con PL/SQL.
-- **Persistence Layer (SQLModel + Oracle):** Modelado de datos y migraciones con Alembic.
-- **DB Layer (PL/SQL):** Triggers de auditoría, Procedimientos de transferencia y Vistas de reporte.
+The project was created to explore how traditional enterprise database
+technologies can work together with modern REST API architectures,
+containerization, automated testing, and CI/CD practices.
 
-## 📊 Diagrama Entidad-Relación (DER)
+## Why I Built This Project
 
-```mermaid
-erDiagram
-    TIPO_CLIENTES ||--o{ CLIENTES : "clasifica"
-    CATEGORIA_PRODUCTOS ||--o{ PRODUCTOS : "clasifica"
-    CLIENTES ||--o{ CARTERA : "posee"
-    PRODUCTOS ||--o{ CARTERA : "contiene"
-    CARTERA ||--o{ FACTURAS : "genera"
-    FACTURAS ||--o{ PAGOS : "recibe"
-    CARTERA ||--o{ AUD_CARTERA : "registra cambios"
+My professional background is primarily focused on the Oracle ecosystem,
+including SQL, PL/SQL, Oracle Forms and Reports, and enterprise
+transactional applications.
 
-    CLIENTES {
-        int id PK
-        string nombre
-        string email
-        string telefono
-        string estado
-        int id_tipo_cliente FK
-    }
+At the same time, I have been developing practical experience with
+modern backend technologies such as Python, FastAPI, REST APIs, Docker,
+automated testing, and CI/CD through independent projects and training.
 
-    CARTERA {
-        int id PK
-        int cliente_id FK
-        int producto_id FK
-        decimal saldo_pendiente
-        datetime fecha_inicio
-    }
+This project brings both areas together.
 
-    AUD_CARTERA {
-        int id PK
-        int id_cartera
-        string tipo_operacion
-        string valor_anterior
-        string valor_nuevo
-        string usuario_bd
-        timestamp fecha_hora
-    }
+It is an opportunity to demonstrate how I can work with Oracle database
+logic while applying modern backend development practices.
+
+## Architecture
+
+The application follows a layered architecture:
+
+```text
+┌──────────────────────────────────────────────┐
+│              FastAPI REST API                │
+│              API Layer                       │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│              Service Layer                   │
+│        Business Logic / PL/SQL Integration   │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│        Persistence Layer                     │
+│        SQLModel + Oracle + Alembic           │
+└──────────────────────┬───────────────────────┘
+                       │
+                       ▼
+┌──────────────────────────────────────────────┐
+│             Oracle Database 21c              │
+│                                              │
+│   PL/SQL Procedures · Triggers · Views       │
+└──────────────────────────────────────────────┘
+
+
 ```
 
-## 🛠️ Quick Start (Docker)
 
-Sigue estos pasos para levantar el entorno completo en menos de 5 minutos:
+## Architecture principles
+- FastAPI handles HTTP requests and REST endpoints.
+- Service Layer contains application logic and coordinates database operations.
+- SQLModel provides data models and database interaction.
+- PL/SQL handles selected database-level operations and auditing.
+- Alembic manages database migrations.
+- Docker provides a reproducible development environment.
 
-### 1. Requisitos
-- Docker y Docker Compose instalados.
-- Python 3.10+ (opcional para desarrollo local).
+### `Oracle + Modern Backend`
 
-### 2. Configuración
-Crea un archivo `.env` basado en `.env.example`:
-```bash
-cp .env.example .env
-```
+```markdown
+## Oracle + Modern Backend
 
-### 3. Levantar el Sistema
-```bash
-# Levantar base de datos y API
-docker-compose up -d
-```
+One of the main goals of this project is to demonstrate the coexistence
+of Oracle database technologies with a modern Python backend.
 
-### 4. Inicializar Datos (Seed)
-Una vez que Oracle esté listo (puedes verificar con `docker logs oracle_db`), ejecuta el script de poblado:
-```bash
-# Instalación de dependencias locales para el seed
-pip install -r requirements.txt
-python seed_db.py
-```
+```text
+Oracle / PL/SQL
+      │
+      │ Business Logic
+      ▼
+FastAPI / Python
+      │
+      │ REST API
+      ▼
+Modern Application Clients
 
 ## 🔌 Uso de la API
 
@@ -95,5 +101,23 @@ Ejecuta la suite de pruebas unitarias y de integración:
 pytest
 ```
 
----
-**Desarrollado con ❤️ para entornos financieros de alta disponibilidad.**
+# 8. Tech Stack
+
+```markdown
+## Technology Stack
+
+| Area | Technologies |
+|---|---|
+| Backend | Python, FastAPI |
+| Data Modeling | SQLModel |
+| Database | Oracle Database 21c XE |
+| Database Logic | PL/SQL |
+| Migrations | Alembic |
+| Testing | Pytest |
+| Code Quality | Ruff |
+| Security Analysis | Bandit, Safety |
+| Containerization | Docker, Docker Compose |
+| CI/CD | GitHub Actions |
+| API Documentation | OpenAPI / Swagger |
+
+```
