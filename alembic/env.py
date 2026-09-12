@@ -2,19 +2,23 @@ import os
 import sys
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config, create_engine
-from sqlalchemy import pool
 from dotenv import load_dotenv
-
-from alembic import context
+from sqlalchemy import create_engine, pool
 
 # --- ESTO ES LO NUEVO PARA SQLMODEL ---
 from sqlmodel import SQLModel
+
+from alembic import context
+
 # Añadir el directorio raíz al path para importar los modelos
 sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Importar modelos a través del __init__ corregido
-from app.models import Clientes, TipoClientes, Cartera, Factura, Producto, CategoriaProducto, Pagos
+import app.models  # noqa: F401  (efecto lateral: registra los modelos en SQLModel.metadata para autogenerate)
+
+# Reutilizar la construcción de URL de la capa de base de datos (fuente única)
+from app.database.connection import build_dsn
+
 # ---------------------------------------
 
 load_dotenv()
@@ -39,13 +43,8 @@ def include_object(object, name, type_, reflected, compare_to):
     return True
 
 def get_url():
-    user = os.getenv("DB_USER", "system")
-    password = os.getenv("ORACLE_PWD", "oracle")
-    host = os.getenv("DB_HOST", "localhost")
-    port = os.getenv("DB_PORT", "1522")
-    service = os.getenv("DB_SERVICE_NAME", "XEPDB1")
-    # Formato más robusto para oracledb
-    return f"oracle+oracledb://{user}:{password}@{host}:{port}/?service_name={service}"
+    # Fuente única de configuración: app.database.connection (mismos defaults que la API)
+    return build_dsn()
 
 def run_migrations_offline() -> None:
     url = get_url()
@@ -68,7 +67,7 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, 
+            connection=connection,
             target_metadata=target_metadata,
             include_object=include_object,
         )
