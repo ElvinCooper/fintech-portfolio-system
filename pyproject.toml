@@ -7,7 +7,7 @@ exclude = [
     ".vscode",
     "venv",
     "__pycache__",
-    "alembic",
+    "alembic/versions",
 ]
 
 line-length = 120 # Aumentado para evitar errores de longitud en docstrings

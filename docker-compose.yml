@@ -5,6 +5,9 @@ services:
     container_name: fintech_api
     env_file: .env
     environment:
+      - DB_HOST=db # Nombre del servicio dentro de la red de compose
+      - DB_PORT=1521
+      - DB_SERVICE_NAME=XEPDB1
       - FRONTEND_URL=${FRONTEND_URL}
     ports:
       - "8000:8000"
@@ -13,6 +16,7 @@ services:
         condition: service_healthy # Wait for db service to be healthy
     volumes:
       - .:/src
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload # Solo desarrollo; la imagen base corre sin --reload
 
 
   db:
@@ -24,11 +28,12 @@ services:
     volumes:
       - fintech_data:/opt/oracle/oradata
     restart: unless-stopped
-    healthcheck: # Add healthcheck to db service
-      test: ["CMD", "sh", "-c", "sqlplus -L system/oracle@localhost:1521/XEPDB1 AS SYSDBA <<< 'select 1 from dual;' > /dev/null"]
-      interval: 10s
-      timeout: 5s
-      retries: 10 # Allow enough retries for Oracle to start
+    healthcheck: # Healthcheck nativo de la imagen Oracle XE (más estable que sqlplus bajo Docker Desktop)
+      test: ["CMD-SHELL", "/opt/oracle/checkDBStatus.sh >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 20
+      start_period: 300s
 
 volumes:
   fintech_data:
