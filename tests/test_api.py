@@ -64,9 +64,7 @@ async def test_transferir_saldo_error(client):
 @pytest.mark.asyncio
 async def test_get_movimientos(client):
     """Prueba el endpoint de movimientos usando mock de servicio."""
-    mock_movimientos = [
-        {"id_cartera": 1, "tipo_operacion": "INSERT", "valor_anterior": None, "valor_nuevo": "500.00"}
-    ]
+    mock_movimientos = [{"id_cartera": 1, "tipo_operacion": "INSERT", "valor_anterior": None, "valor_nuevo": "500.00"}]
 
     with patch("app.services.portfolio_services.get_movimientos", new_callable=AsyncMock) as mock_get:
         mock_get.return_value = mock_movimientos

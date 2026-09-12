@@ -11,7 +11,7 @@ from sqlmodel import SQLModel
 from alembic import context
 
 # Añadir el directorio raíz al path para importar los modelos
-sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Importar modelos a través del __init__ corregido
 import app.models  # noqa: F401  (efecto lateral: registra los modelos en SQLModel.metadata para autogenerate)
@@ -34,6 +34,7 @@ if config.config_file_name is not None:
 # target_metadata
 target_metadata = SQLModel.metadata
 
+
 def include_object(object, name, type_, reflected, compare_to):
     if type_ == "table":
         if name.lower().startswith("logmnr") or name.lower().startswith("logstdby"):
@@ -42,9 +43,11 @@ def include_object(object, name, type_, reflected, compare_to):
             return False
     return True
 
+
 def get_url():
     # Fuente única de configuración: app.database.connection (mismos defaults que la API)
     return build_dsn()
+
 
 def run_migrations_offline() -> None:
     url = get_url()

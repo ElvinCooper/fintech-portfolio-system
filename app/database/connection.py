@@ -29,9 +29,7 @@ def build_dsn(
 SYNC_DATABASE_URL = build_dsn()
 
 # URL para conexión Asincrónica (Para la API FastAPI)
-ASYNC_DATABASE_URL = SYNC_DATABASE_URL.replace(
-    "oracle+oracledb://", "oracle+oracledb_async://", 1
-)
+ASYNC_DATABASE_URL = SYNC_DATABASE_URL.replace("oracle+oracledb://", "oracle+oracledb_async://", 1)
 
 # Motor de base de datos asíncrono
 async_engine = create_async_engine(ASYNC_DATABASE_URL, echo=True, future=True)

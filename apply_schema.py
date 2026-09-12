@@ -3,6 +3,7 @@
 Regenera la vista, el trigger de auditoría, los procedimientos y la función.
 Las credenciales se leen de variables de entorno (.env).
 """
+
 import os
 import re
 
