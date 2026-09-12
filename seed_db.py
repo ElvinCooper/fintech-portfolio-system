@@ -1,29 +1,18 @@
-import os
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-load_dotenv()
-
+# Reutiliza la construcción de URL de la capa de base de datos (fuente única)
+from app.database.connection import build_dsn
 from app.models.cartera import Cartera
 from app.models.clientes import Clientes, TipoClientes
 from app.models.facturas import Factura
 from app.models.pagos import Pagos
 from app.models.productos import CategoriaProducto, Producto
 
-# Configuración Sincrónica para el seed
-DB_USER = os.getenv("DB_USER", "system")
-DB_PASSWORD = os.getenv("ORACLE_PWD", "Myoraclesecret")
-DB_HOST = "localhost"
-DB_PORT = "1522"
-DB_SERVICE = os.getenv("DB_SERVICE_NAME", "XEPDB1")
-
-SYNC_URL = f"oracle+oracledb://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/?service_name={DB_SERVICE}"
-
-engine = create_engine(SYNC_URL, echo=True)
+engine = create_engine(build_dsn(), echo=True)
 SessionLocal = sessionmaker(bind=engine)
 
 

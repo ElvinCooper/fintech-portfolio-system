@@ -1,13 +1,8 @@
 from sqlalchemy import create_engine, text
 
-user = "system"
-password = "Myoraclesecret"
-host = "localhost"
-port = "1522"
-service = "XEPDB1"
+from app.database.connection import build_dsn
 
-url = f"oracle+oracledb://{user}:{password}@{host}:{port}/?service_name={service}"
-engine = create_engine(url)
+engine = create_engine(build_dsn())
 
 tables = [
     "ALEMBIC_VERSION",

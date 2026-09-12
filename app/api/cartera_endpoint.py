@@ -41,7 +41,7 @@ async def transferir_saldo(request: TransferenciaRequest, session: AsyncSession 
 @router.get("/movimientos/{id_cartera}", response_model=list[dict[str, Any]])
 async def get_movimientos(id_cartera: int, session: AsyncSession = Depends(get_async_session)):
     """
-    Obtiene el historial de movimientos de una cartera desde un SYS_REFCURSOR de Oracle.
+    Obtiene el historial de movimientos de una cartera desde la tabla de auditoría AUD_CARTERA.
     """
     return await portfolio_services.get_movimientos(session=session, id_cartera=id_cartera)
 

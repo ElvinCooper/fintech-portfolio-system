@@ -32,7 +32,7 @@ BEGIN
                              VALOR_NUEVO,
                              USUARIO_BD,
                              FECHA_HORA)
-                      VALUES (:OLD.ID,
+                      VALUES (NVL(:OLD.ID, :NEW.ID),
                               v_tipo_op,
                               CASE WHEN v_tipo_op != 'INSERT' THEN TO_CHAR(:OLD.SALDO_PENDIENTE) ELSE NULL END,
                               CASE WHEN v_tipo_op != 'DELETE' THEN TO_CHAR(:NEW.SALDO_PENDIENTE) ELSE NULL END,
