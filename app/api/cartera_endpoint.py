@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -17,7 +18,7 @@ router = APIRouter(
 class TransferenciaRequest(BaseModel):
     id_origen: int
     id_destino: int
-    monto: float
+    monto: Decimal
 
 
 @router.post("/transferir", status_code=200)

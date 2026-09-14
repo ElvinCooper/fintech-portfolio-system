@@ -49,12 +49,73 @@ CREATE OR REPLACE PROCEDURE SP_TRANSFERIR_SALDO (
     p_codigo_res     OUT NUMBER,
     p_mensaje_res    OUT VARCHAR2
 ) AS
-    v_saldo_origen NUMBER;
+    v_saldo_origen  NUMBER;
+    v_saldo_destino NUMBER;
 BEGIN
-    SELECT saldo_pendiente INTO v_saldo_origen
-    FROM CARTERA WHERE id = p_id_origen FOR UPDATE;
+    -- Validaciones de parametros
+    IF p_monto IS NULL OR p_monto <= 0 THEN
+        p_codigo_res  := 1;
+        p_mensaje_res := 'El monto debe ser mayor que cero.';
+        RETURN;
+    END IF;
+
+    IF p_id_origen = p_id_destino THEN
+        p_codigo_res  := 1;
+        p_mensaje_res := 'La cartera origen y destino deben ser diferentes.';
+        RETURN;
+    END IF;
+
+    -- Operacion atomica: se bloquean ambas carteras en orden determinístico
+    -- (ID ascendente) para reducir el riesgo de deadlocks entre transferencias
+    -- concurrentes en direcciones opuestas.
+    IF p_id_origen < p_id_destino THEN
+        BEGIN
+            SELECT saldo_pendiente INTO v_saldo_origen
+            FROM CARTERA WHERE id = p_id_origen FOR UPDATE;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                ROLLBACK;
+                p_codigo_res  := 1;
+                p_mensaje_res := 'La cartera origen no existe.';
+                RETURN;
+        END;
+
+        BEGIN
+            SELECT saldo_pendiente INTO v_saldo_destino
+            FROM CARTERA WHERE id = p_id_destino FOR UPDATE;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                ROLLBACK;
+                p_codigo_res  := 1;
+                p_mensaje_res := 'La cartera destino no existe.';
+                RETURN;
+        END;
+    ELSE
+        BEGIN
+            SELECT saldo_pendiente INTO v_saldo_destino
+            FROM CARTERA WHERE id = p_id_destino FOR UPDATE;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                ROLLBACK;
+                p_codigo_res  := 1;
+                p_mensaje_res := 'La cartera destino no existe.';
+                RETURN;
+        END;
+
+        BEGIN
+            SELECT saldo_pendiente INTO v_saldo_origen
+            FROM CARTERA WHERE id = p_id_origen FOR UPDATE;
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                ROLLBACK;
+                p_codigo_res  := 1;
+                p_mensaje_res := 'La cartera origen no existe.';
+                RETURN;
+        END;
+    END IF;
 
     IF v_saldo_origen < p_monto THEN
+        ROLLBACK;
         p_codigo_res  := 1;
         p_mensaje_res := 'Saldo insuficiente en la cartera origen.';
         RETURN;
@@ -69,10 +130,6 @@ BEGIN
     p_mensaje_res := 'Transferencia exitosa.';
 
 EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        ROLLBACK;
-        p_codigo_res  := 1;
-        p_mensaje_res := 'Una o ambas carteras no existen.';
     WHEN OTHERS THEN
         ROLLBACK;
         p_codigo_res  := 2;

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import Integer, String, bindparam, select, text
@@ -17,7 +18,7 @@ async def get_all_clients(session: AsyncSession):
     return result.scalars().all()
 
 
-async def transferir_saldo(session: AsyncSession, id_origen: int, id_destino: int, monto: float) -> dict[str, Any]:
+async def transferir_saldo(session: AsyncSession, id_origen: int, id_destino: int, monto: Decimal) -> dict[str, Any]:
     """
     Invoca el procedimiento SP_TRANSFERIR_SALDO manejando parámetros OUT de forma manual para máxima compatibilidad.
     """
@@ -51,16 +52,18 @@ async def transferir_saldo(session: AsyncSession, id_origen: int, id_destino: in
 
     result = await session.execute(stmt, params)
 
-    # Intentamos recuperar del diccionario de parámetros de salida
+    # Si no se pueden recuperar los parámetros OUT es un error controlado:
+    # jamás se convierte un fallo en un éxito.
     try:
-        # En SQLAlchemy asíncrono con oracledb, los valores OUT se inyectan de vuelta en el objeto result
-        out = result.out_parameters
-        res = {"codigo": out["codigo_res"], "mensaje": out["mensaje_res"]}
-    except Exception:
-        # Si falla la recuperación pero no hubo error SQL, asumimos éxito parcial
-        res = {"codigo": 0, "mensaje": "Transferencia procesada correctamente."}
+        res = {
+            "codigo": result.out_parameters["codigo_res"],
+            "mensaje": result.out_parameters["mensaje_res"],
+        }
+    except Exception as e:
+        await session.rollback()
+        return {"codigo": 2, "mensaje": f"No se pudieron recuperar los parámetros de salida de la transferencia: {e}"}
 
-    # SIEMPRE hacemos commit antes de devolver el resultado
+    # El procedimiento interno gestiona COMMIT/ROLLBACK; se deja la transacción consistente.
     await session.commit()
     return res
 

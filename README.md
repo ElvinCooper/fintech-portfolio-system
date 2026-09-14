@@ -174,14 +174,16 @@ Interactive documentation is available at:
 
 ## Testing & Code Quality
 
-Run the test suite and linter inside a dev container (no local Python needed):
+The test suite is fully mocked and does not require a running Oracle database.
+Set up a local environment and run:
 
 ```bash
-# Unit + integration tests
-docker run --rm -v "C:/path/to/repo:/src" -w /src fintech-api-test-dev sh -c "pytest -q"
+pip install -r requirements-dev.txt
+pytest -q
 
-# Linting
-docker run --rm -v "C:/path/to/repo:/src" -w /src fintech-api-test-dev sh -c "ruff check ."
+# Linting (must match CI)
+ruff check .
+ruff format --check .
 ```
 
 The CI pipeline (GitHub Actions) runs: Ruff (`lint`), Bandit and Safety
